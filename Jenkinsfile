@@ -39,5 +39,28 @@ pipeline {
                 }
             }
         }
+        stage("Build") {
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        stage("Docker Build and Push") {
+            steps {
+                script{
+                    withDockerRegistry(credentialsId: 'd56fa21a-05af-4e97-83ab-712b48193b20', toolName: 'docker') {
+                        
+                        sh "docker build -t image1 ."
+                        sh "docker tag image1 sayan510/pet-clinic123:latest "
+                        sh "docker push sayan510/pet-clinic123:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY") {
+            steps {
+                sh " trivy image sayan510/pet-clinic123:latest"
+            }
+        }
+        
     }
 }
